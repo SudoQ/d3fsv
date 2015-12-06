@@ -35,13 +35,13 @@ def walklevel(some_dir, level=1):
 if __name__ == "__main__":
 
 	mypath = "."
-	tuples = []
 	pathMap = {}
 	root = newDir(".")
 	pathMap["."] = root
+
 	for (dirpath, dirnames, filenames) in walk(mypath):
-		#tuples.append((dirpath, dirnames, filenames))
 		currentDir = pathMap[dirpath]
+
 		for d in dirnames:
 			child = newDir(d)
 			currentDir["children"].append(child)
@@ -51,7 +51,4 @@ if __name__ == "__main__":
 			size = path.getsize(path.join(dirpath, f))
 			currentDir["children"].append(newFile(f, size))
 
-	#for (dirpath, dirnames, filenames) in tuples:
-		#print (dirpath, dirnames, filenames)
-		
 	print json.dumps(root, indent=4)
