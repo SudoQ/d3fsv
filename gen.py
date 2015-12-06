@@ -1,6 +1,7 @@
 #coding:utf-8
 import json
 import Queue
+import os
 from os import walk
 from os import path
 
@@ -21,21 +22,25 @@ def newFile(name, size):
 	f["size"] = size
 	return f
 
+def walklevel(some_dir, level=1):
+    some_dir = some_dir.rstrip(os.path.sep)
+    assert os.path.isdir(some_dir)
+    num_sep = some_dir.count(os.path.sep)
+    for root, dirs, files in os.walk(some_dir):
+        yield root, dirs, files
+        num_sep_this = root.count(os.path.sep)
+        if num_sep + level <= num_sep_this:
+            del dirs[:]
+
 if __name__ == "__main__":
-	#parsedJSON = parseFile("example.json")
-	#print(parsedJSON)
-	#print(json.dumps(parsedJSON))
 
 	mypath = "."
 	tuples = []
-	for (dirpath, dirnames, filenames) in walk(mypath):
-		tuples.append((dirpath, dirnames, filenames))
-
 	pathMap = {}
 	root = newDir(".")
 	pathMap["."] = root
-	for (dirpath, dirnames, filenames) in tuples:
-		#print (dirpath, dirnames, filenames)
+	for (dirpath, dirnames, filenames) in walk(mypath):
+		#tuples.append((dirpath, dirnames, filenames))
 		currentDir = pathMap[dirpath]
 		for d in dirnames:
 			child = newDir(d)
@@ -43,21 +48,10 @@ if __name__ == "__main__":
 			pathMap[path.join(dirpath, d)] = child
 
 		for f in filenames:
-			currentDir["children"].append(newFile(f, 42))
+			size = path.getsize(path.join(dirpath, f))
+			currentDir["children"].append(newFile(f, size))
+
+	#for (dirpath, dirnames, filenames) in tuples:
+		#print (dirpath, dirnames, filenames)
 		
-		#print pathMap
-
 	print json.dumps(root, indent=4)
-
-
-			#	systemMap[dirpath] = {"dirs":dirnames, "files": filenames}
-
-			#q = Queue.Queue()	
-			#q.put(".")
-			#current = root
-			#while not q.empty():
-			#	nextPath = q.get()
-			#	currentDir = systemMap[nextPath]
-			#	for d in currentDir["dirs"]:
-			#		current["children"].append(d)
-			
